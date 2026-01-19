@@ -30,46 +30,69 @@ const HowItWorks = () => {
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 12 
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  };
+
   return (
     <section className="section section-how">
       <div className="container">
         <motion.h2
           className="section-title text-center"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ 
+            duration: 0.5,
+            ease: [0.4, 0, 0.2, 1]
+          }}
         >
           How It Works
         </motion.h2>
 
-        <div className="steps-grid">
-          {steps.map((step, index) => (
+        <motion.div
+          className="steps-grid"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          {steps.map((step) => (
             <motion.div
               key={step.number}
               className="step"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ 
-                delay: index * 0.1,
-                duration: 0.5,
-                ease: "easeOut"
-              }}
-              whileHover={{ y: -4 }}
+              variants={itemVariants}
             >
-              <motion.div
-                className="step-number"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
+              <div className="step-number">
                 {step.number}
-              </motion.div>
+              </div>
               <h3 className="step-title">{step.title}</h3>
               <p className="step-description">{step.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

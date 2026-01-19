@@ -23,6 +23,24 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Jobs', path: '/jobs' },
@@ -31,35 +49,47 @@ const Navbar = () => {
     { name: 'Contact', path: '/contact' },
   ];
 
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.3 }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.25 }
+    }
+  };
+
   const menuVariants = {
-    closed: {
-      x: "100%",
+    hidden: { x: "100%", opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
       transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40
+        duration: 0.4,
+        ease: [0.4, 0, 0.2, 1]
       }
     },
-    open: {
-      x: 0,
+    exit: {
+      x: "100%",
+      opacity: 0,
       transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40
+        duration: 0.35,
+        ease: [0.4, 0, 0.2, 1]
       }
     }
   };
 
   const linkVariants = {
-    closed: { x: 50, opacity: 0 },
-    open: (i) => ({
+    hidden: { x: 20, opacity: 0 },
+    visible: (i) => ({
       x: 0,
       opacity: 1,
       transition: {
-        delay: i * 0.1,
-        type: "spring",
-        stiffness: 300,
-        damping: 24
+        delay: 0.1 + i * 0.05,
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1]
       }
     })
   };
@@ -72,7 +102,6 @@ const Navbar = () => {
             <img src={Logo} alt="Genius International" />
           </Link>
 
-          {/* Desktop Navigation */}
           <ul className="navbar-links hidden-mobile">
             {navLinks.map((link) => (
               <li key={link.path}>
@@ -86,53 +115,54 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Mobile Menu Button */}
           <motion.button
             className="navbar-toggle hidden-desktop"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.95 }}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <>
             <motion.div
-              className="navbar-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              className="mobile-menu-overlay"
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              className="navbar-mobile"
+              className="mobile-menu"
               variants={menuVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <ul className="navbar-mobile-links">
+              <nav className="mobile-menu-nav">
                 {navLinks.map((link, i) => (
-                  <motion.li
+                  <motion.div
                     key={link.path}
                     custom={i}
                     variants={linkVariants}
-                    initial="closed"
-                    animate="open"
+                    initial="hidden"
+                    animate="visible"
                   >
                     <Link
                       to={link.path}
-                      className={`navbar-mobile-link ${location.pathname === link.path ? 'active' : ''}`}
+                      className={`mobile-menu-link ${location.pathname === link.path ? 'active' : ''}`}
+                      onClick={() => setIsOpen(false)}
                     >
                       {link.name}
                     </Link>
-                  </motion.li>
+                  </motion.div>
                 ))}
-              </ul>
+              </nav>
             </motion.div>
           </>
         )}

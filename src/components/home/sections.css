@@ -55,6 +55,7 @@
 
 .step {
   text-align: center;
+  will-change: transform, opacity;
 }
 
 .step-number {
@@ -71,6 +72,7 @@
   margin: 0 auto var(--spacing-md);
   box-shadow: 0 4px 12px rgba(139, 21, 56, 0.25);
   position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .step-number::before {
@@ -80,12 +82,12 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent-rose) 100%);
   opacity: 0;
-  transition: opacity var(--transition-smooth);
+  transition: opacity 0.3s ease;
   z-index: -1;
 }
 
 .step:hover .step-number {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .step:hover .step-number::before {

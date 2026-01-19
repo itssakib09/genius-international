@@ -1,66 +1,49 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Briefcase, MapPin, DollarSign } from 'lucide-react';
+import { MapPin, DollarSign } from 'lucide-react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/db';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import './pages.css';
 
 const Jobs = () => {
-  const jobs = [
-    {
-      id: 1,
-      title: 'Construction Worker',
-      country: 'Russia',
-      location: 'Moscow',
-      salary: '$800 - $1,200/month',
-      type: 'Full-time',
-      description: 'Experienced workers needed for residential construction projects.',
-    },
-    {
-      id: 2,
-      title: 'Hotel Staff',
-      country: 'Qatar',
-      location: 'Doha',
-      salary: '$900 - $1,400/month',
-      type: 'Full-time',
-      description: 'Housekeeping and front desk positions available in 5-star hotels.',
-    },
-    {
-      id: 3,
-      title: 'Warehouse Operator',
-      country: 'Europe',
-      location: 'Poland',
-      salary: '€1,000 - €1,500/month',
-      type: 'Full-time',
-      description: 'Forklift operators and logistics staff for warehouse operations.',
-    },
-    {
-      id: 4,
-      title: 'Factory Worker',
-      country: 'Russia',
-      location: 'St. Petersburg',
-      salary: '$750 - $1,100/month',
-      type: 'Full-time',
-      description: 'Production line workers for manufacturing facility.',
-    },
-    {
-      id: 5,
-      title: 'Restaurant Staff',
-      country: 'Qatar',
-      location: 'Doha',
-      salary: '$850 - $1,300/month',
-      type: 'Full-time',
-      description: 'Cooks, waiters, and kitchen helpers for international restaurants.',
-    },
-    {
-      id: 6,
-      title: 'Agricultural Worker',
-      country: 'Europe',
-      location: 'Netherlands',
-      salary: '€1,200 - €1,600/month',
-      type: 'Seasonal',
-      description: 'Seasonal workers for greenhouse and farm operations.',
-    },
-  ];
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const q = query(
+          collection(db, 'jobs'),
+          where('status', '==', 'active')
+        );
+        const querySnapshot = await getDocs(q);
+        const jobsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setJobs(jobsData);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  const getCountryFlag = (country) => {
+    const flags = {
+      'Russia': '🇷🇺',
+      'Qatar': '🇶🇦',
+      'Europe': '🇪🇺',
+      'Poland': '🇵🇱',
+      'Netherlands': '🇳🇱'
+    };
+    return flags[country] || '🌍';
+  };
 
   return (
     <main className="page-content">
@@ -81,35 +64,45 @@ const Jobs = () => {
 
       <section className="section">
         <div className="container">
-          <div className="jobs-grid">
-            {jobs.map((job) => (
-              <Card key={job.id} className="job-card">
-                <div className="job-header">
-                  <div className="job-flag">{job.country === 'Russia' ? '🇷🇺' : job.country === 'Qatar' ? '🇶🇦' : '🇪🇺'}</div>
-                  <span className="job-type">{job.type}</span>
-                </div>
-                
-                <h3 className="job-title">{job.title}</h3>
-                
-                <div className="job-details">
-                  <div className="job-detail">
-                    <MapPin size={18} />
-                    <span>{job.location}, {job.country}</span>
+          {loading ? (
+            <div className="jobs-loading">
+              <p>Loading jobs...</p>
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="jobs-empty">
+              <p>No job opportunities available at the moment. Please check back later.</p>
+            </div>
+          ) : (
+            <div className="jobs-grid">
+              {jobs.map((job) => (
+                <Card key={job.id} className="job-card">
+                  <div className="job-header">
+                    <div className="job-flag">{getCountryFlag(job.country)}</div>
+                    <span className="job-type">{job.jobType}</span>
                   </div>
-                  <div className="job-detail">
-                    <DollarSign size={18} />
-                    <span>{job.salary}</span>
+                  
+                  <h3 className="job-title">{job.jobTitle}</h3>
+                  
+                  <div className="job-details">
+                    <div className="job-detail">
+                      <MapPin size={18} />
+                      <span>{job.location}, {job.country}</span>
+                    </div>
+                    <div className="job-detail">
+                      <DollarSign size={18} />
+                      <span>{job.salaryRange}</span>
+                    </div>
                   </div>
-                </div>
 
-                <p className="job-description">{job.description}</p>
+                  <p className="job-description">{job.description}</p>
 
-                <Button href="/contact" variant="secondary" size="sm" className="job-apply-btn">
-                  Visit Office to Apply
-                </Button>
-              </Card>
-            ))}
-          </div>
+                  <Button href="/contact" variant="secondary" size="sm" className="job-apply-btn">
+                    Visit Office to Apply
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          )}
 
           <motion.div
             className="jobs-cta"

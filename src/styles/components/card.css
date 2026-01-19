@@ -8,6 +8,7 @@
   position: relative;
   overflow: hidden;
   width: 100%;
+  will-change: transform;
 }
 
 .card::before {
@@ -29,6 +30,7 @@
 .card:hover {
   background: var(--bg-white);
   border-color: var(--primary-light);
+  box-shadow: var(--shadow-hover);
 }
 
 /* Variants */

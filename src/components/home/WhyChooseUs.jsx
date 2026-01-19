@@ -27,42 +27,67 @@ const WhyChooseUs = () => {
     },
   ];
 
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: 0,
+      y: 12
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.45,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  };
+
   return (
     <section className="section section-why">
       <div className="container">
         <motion.h2
           className="section-title text-center"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ 
+            duration: 0.45,
+            ease: [0.4, 0, 0.2, 1]
+          }}
         >
           Why Choose Genius International
         </motion.h2>
 
-        <div className="features-grid">
-          {features.map((feature, index) => {
+        <motion.div
+          className="features-grid"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} className="feature-card">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 200
-                  }}
-                >
+              <motion.div key={feature.title} variants={itemVariants}>
+                <Card className="feature-card" hover={true}>
                   <Icon className="feature-icon" size={40} strokeWidth={1.5} />
-                </motion.div>
-                <h3 className="feature-title">{feature.title}</h3>
-                <p className="feature-description">{feature.description}</p>
-              </Card>
+                  <h3 className="feature-title">{feature.title}</h3>
+                  <p className="feature-description">{feature.description}</p>
+                </Card>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
