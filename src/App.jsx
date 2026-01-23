@@ -13,6 +13,9 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminJobList from './pages/admin/jobs/JobList';
 import AddJob from './pages/admin/jobs/AddJob';
 import EditJob from './pages/admin/jobs/EditJob';
+import CandidateList from './pages/admin/candidates/CandidateList';
+import AddCandidate from './pages/admin/candidates/AddCandidate';
+import EditCandidate from './pages/admin/candidates/EditCandidate';
 import './styles/global.css';
 import './styles/theme.css';
 
@@ -51,6 +54,30 @@ function App() {
           element={
             <ProtectedRoute>
               <EditJob />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/candidates" 
+          element={
+            <ProtectedRoute>
+              <CandidateList />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/candidates/add" 
+          element={
+            <ProtectedRoute>
+              <AddCandidate />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/candidates/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <EditCandidate />
             </ProtectedRoute>
           } 
         />

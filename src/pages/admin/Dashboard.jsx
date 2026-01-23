@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Briefcase, TrendingUp } from 'lucide-react';
+import { Briefcase, Users, TrendingUp, UserCheck } from 'lucide-react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/db';
 import AdminLayout from '../../components/admin/AdminLayout';
@@ -10,13 +10,16 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalJobs: 0,
-    activeJobs: 0
+    activeJobs: 0,
+    totalCandidates: 0,
+    pendingCandidates: 0
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // Jobs stats
         const jobsSnapshot = await getDocs(collection(db, 'jobs'));
         const totalJobs = jobsSnapshot.size;
         
@@ -24,7 +27,15 @@ const AdminDashboard = () => {
         const activeSnapshot = await getDocs(activeQuery);
         const activeJobs = activeSnapshot.size;
 
-        setStats({ totalJobs, activeJobs });
+        // Candidates stats
+        const candidatesSnapshot = await getDocs(collection(db, 'candidates'));
+        const totalCandidates = candidatesSnapshot.size;
+        
+        const pendingQuery = query(collection(db, 'candidates'), where('status', '==', 'pending'));
+        const pendingSnapshot = await getDocs(pendingQuery);
+        const pendingCandidates = pendingSnapshot.size;
+
+        setStats({ totalJobs, activeJobs, totalCandidates, pendingCandidates });
       } catch (error) {
         console.error('Error fetching stats:', error);
       } finally {
@@ -47,6 +58,18 @@ const AdminDashboard = () => {
       value: loading ? '...' : stats.activeJobs,
       icon: TrendingUp,
       color: '#059669'
+    },
+    {
+      label: 'Total Candidates',
+      value: loading ? '...' : stats.totalCandidates,
+      icon: Users,
+      color: '#7C3AED'
+    },
+    {
+      label: 'Pending Applications',
+      value: loading ? '...' : stats.pendingCandidates,
+      icon: UserCheck,
+      color: '#DC2626'
     }
   ];
 
@@ -56,6 +79,12 @@ const AdminDashboard = () => {
       description: 'Add, edit, or remove job listings',
       action: () => navigate('/admin/jobs'),
       icon: Briefcase
+    },
+    {
+      title: 'Manage Candidates',
+      description: 'View and manage candidate applications',
+      action: () => navigate('/admin/candidates'),
+      icon: Users
     }
   ];
 
