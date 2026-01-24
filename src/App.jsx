@@ -16,6 +16,9 @@ import EditJob from './pages/admin/jobs/EditJob';
 import CandidateList from './pages/admin/candidates/CandidateList';
 import AddCandidate from './pages/admin/candidates/AddCandidate';
 import EditCandidate from './pages/admin/candidates/EditCandidate';
+import TrackingList from './pages/admin/tracking/TrackingList';
+import AddTracking from './pages/admin/tracking/AddTracking';
+import EditTracking from './pages/admin/tracking/EditTracking';
 import './styles/global.css';
 import './styles/theme.css';
 
@@ -81,6 +84,32 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* Tracking Routes */}
+<Route 
+  path="/admin/tracking" 
+  element={
+    <ProtectedRoute>
+      <TrackingList />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/admin/tracking/add" 
+  element={
+    <ProtectedRoute>
+      <AddTracking />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/admin/tracking/edit/:id" 
+  element={
+    <ProtectedRoute>
+      <EditTracking />
+    </ProtectedRoute>
+  } 
+/>
 
         {/* Public Routes */}
         <Route

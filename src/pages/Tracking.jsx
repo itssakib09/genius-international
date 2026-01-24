@@ -4,29 +4,50 @@ import { Search, CheckCircle2, Clock, Package } from 'lucide-react';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import './pages.css';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/db';
 
-const Tracking = () => {
+function Tracking() {
   const [trackingId, setTrackingId] = useState('');
+  const [error, setError] = useState('');
   const [showDemo, setShowDemo] = useState(false);
+  const [demoStatus, setDemoStatus] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (trackingId.trim()) {
-      setShowDemo(true);
-    }
-  };
+    setShowDemo(false);
+    setError('');
 
-  const demoStatus = {
-    id: trackingId || 'GEN2025001',
-    applicant: 'Sample Applicant',
-    country: 'Qatar',
-    status: 'In Progress',
-    timeline: [
-      { step: 'Application Submitted', status: 'completed', date: '15 Jan 2025' },
-      { step: 'Document Verification', status: 'completed', date: '18 Jan 2025' },
-      { step: 'Embassy Processing', status: 'in-progress', date: 'In Progress' },
-      { step: 'Visa Approved', status: 'pending', date: 'Pending' },
-    ],
+    try {
+      const q = query(
+        collection(db, 'tracking'),
+        where('trackingId', '==', trackingId.trim())
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        setError('No tracking information found for this ID. Please check and try again.');
+        return;
+      }
+
+      const trackingData = querySnapshot.docs[0].data();
+      setDemoStatus({
+        id: trackingData.trackingId,
+        applicant: trackingData.candidateName,
+        country: trackingData.destination,
+        status: trackingData.status,
+        timeline: trackingData.timeline.map(t => ({
+          step: t.step,
+          status: 'completed',
+          date: t.date,
+          note: t.note || ''
+        }))
+      });
+      setShowDemo(true);
+    } catch (error) {
+      console.error('Error fetching tracking:', error);
+      setError('Failed to fetch tracking information. Please try again.');
+    }
   };
 
   return (
@@ -63,6 +84,11 @@ const Tracking = () => {
               <Button type="submit" variant="primary" size="lg">
                 Track Application
               </Button>
+              {error && (
+                <div className="tracking-error-message">
+                  {error}
+                </div>
+              )}
             </form>
           </Card>
 
@@ -113,12 +139,7 @@ const Tracking = () => {
                   </div>
                 </div>
 
-                <div className="tracking-note">
-                  <p>
-                    <strong>Note:</strong> This is a demo result. Your actual tracking information 
-                    will be available after you receive your tracking ID from our office.
-                  </p>
-                </div>
+                
               </Card>
             </motion.div>
           )}
@@ -143,6 +164,6 @@ const Tracking = () => {
       </section>
     </main>
   );
-};
+}
 
 export default Tracking;

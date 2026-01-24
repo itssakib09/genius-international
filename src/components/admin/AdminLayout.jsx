@@ -2,7 +2,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Briefcase, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, FileText, LogOut } from 'lucide-react';
 import '../../styles/components/admin-layout.css';
 
 const AdminLayout = ({ children }) => {
@@ -19,10 +19,11 @@ const AdminLayout = ({ children }) => {
   };
 
   const navItems = [
-    { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-    { path: '/admin/candidates', icon: Users, label: 'Candidates' }
-  ];
+  { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
+  { path: '/admin/candidates', icon: Users, label: 'Candidates' },
+  { path: '/admin/tracking', icon: FileText, label: 'Tracking' }
+];
 
   const isActive = (path) => {
     if (path === '/admin') {
